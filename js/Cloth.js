@@ -73,50 +73,15 @@ function Cloth(w, h) {
 	this.particles = [];
 	this.constrains = [];
 
-	
-
-	// While many system uses shear and bend springs,
-	// the relax constrains model seem to be just fine
-	// using structural springs.
-	// Shear
-	// var diagonalDist = Math.sqrt(restDistance * restDistance * 2);
-
-
-	// for (v=0;v<h;v++) {
-	// 	for (u=0;u<w;u++) {
-
-	// 		constrains.push([
-	// 			particles[index(u, v)],
-	// 			particles[index(u+1, v+1)],
-	// 			diagonalDist
-	// 		]);
-
-	// 		constrains.push([
-	// 			particles[index(u+1, v)],
-	// 			particles[index(u, v+1)],
-	// 			diagonalDist
-	// 		]);
-
-	// 	}
-	// }
-
-
-	//this.particles = particles;
-	//this.constrains = constrains;
 	this.createParticles();
-
-	
-
-	//this.index = index;
-
+	this.createLinkConstrains();
 }
 
 Cloth.prototype.index = function(i, j){
 	return i + j * (this.w + 1);
 }
+
 Cloth.prototype.createParticles = function(){
-	
-	
 	var u, v;
 	// Create particles
 	for (v = 0; v <= this.h; v ++) {
@@ -126,7 +91,9 @@ Cloth.prototype.createParticles = function(){
 			);
 		}
 	}
+}
 
+Cloth.prototype.createLinkConstrains = function(){
 	// Structural
 
 	for (v = 0; v < this.h; v ++) {
@@ -144,7 +111,6 @@ Cloth.prototype.createParticles = function(){
 				this.particles[this.index(u, v)],
 				this.particles[this.index(u + 1, v)],
 				this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u+1, v)].position)
-				//restDistance
 			]);
 
 		}
@@ -155,7 +121,6 @@ Cloth.prototype.createParticles = function(){
 			this.particles[this.index(u, v)],
 			this.particles[this.index(u, v + 1)],
 			this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u, v + 1)].position)
-			//restDistance
 		]);
 	}
 
@@ -164,19 +129,17 @@ Cloth.prototype.createParticles = function(){
 			this.particles[this.index(u, v)],
 			this.particles[this.index(u + 1, v)],
 			this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u+1, v)].position)
-			//restDistance
 		]);
 	}
-
-
 }
 
-function simulate(time) {
+Cloth.prototype.simulate = function(time) {
 	if (!lastTime) {
 		lastTime = time;
 		return;
 	}
 	
+	var particles = this.particles;
 	var i, il, particles, particle, pt, constrains, constrain;
 
 	// Aerodynamics forces
