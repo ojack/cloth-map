@@ -19,7 +19,7 @@ var restDistance = 25;
 var xSegs = 4; //
 var ySegs = 4; //
 
-//var clothFunction = plane(restDistance * xSegs, restDistance * ySegs);
+/* Parametric function representing the shape of the cloth. For more info, see: http://prideout.net/blog/?p=44*/
 var clothFunction = function(u, v){
 	var x = (u - 0.5) * restDistance * xSegs;
 		var y = (v + 0.5) *  restDistance * ySegs;
@@ -28,7 +28,7 @@ var clothFunction = function(u, v){
 		return new THREE.Vector3(x, y, z);
 }
 
-var cloth = new Cloth(xSegs, ySegs);
+
 
 var GRAVITY = 981 * 1.4; // 
 var gravity = new THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
@@ -52,49 +52,7 @@ var tmpForce = new THREE.Vector3();
 var lastTime;
 
 
-function plane(width, height) {
 
-	return function(u, v) {
-		var x = (u - 0.5) * width;
-		var y = (v + 0.5) * height;
-		var z = 0;
-
-		return new THREE.Vector3(x, y, z);
-	};
-}
-
-function Particle(x, y, z, mass) {
-	this.position = clothFunction(x, y);
-	this.previous = clothFunction(x, y); // previous
-	this.original = clothFunction(x, y); 
-	//debugger;
-	this.a = new THREE.Vector3(0, 0, 0); // acceleration
-	this.mass = mass;
-	this.invMass = 1 / mass;
-	this.tmp = new THREE.Vector3();
-	this.tmp2 = new THREE.Vector3();
-}
-
-// Force -> Acceleration
-Particle.prototype.addForce = function(force) {
-	this.a.add(
-		this.tmp2.copy(force).multiplyScalar(this.invMass)
-	);
-};
-
-
-// Performs verlet integration
-Particle.prototype.integrate = function(timesq) {
-	var newPos = this.tmp.subVectors(this.position, this.previous);
-	newPos.multiplyScalar(DRAG).add(this.position);
-	newPos.add(this.a.multiplyScalar(timesq));
-
-	this.tmp = this.previous;
-	this.previous = this.position;
-	this.position = newPos;
-
-	this.a.set(0, 0, 0);
-}
 
 
 var diff = new THREE.Vector3();

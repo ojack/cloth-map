@@ -11,7 +11,7 @@ window.addEventListener( 'resize', onWindowResize, false );
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var container, stats;
-var camera, scene, renderer;
+var camera, scene, renderer, cloth;
 
 var clothGeometry;
 var sphere;
@@ -108,7 +108,7 @@ function initLights(){
 
 function initObjects(){
 	
-
+cloth = new Cloth(xSegs, ySegs);
 var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, color: 0xff0000, specular: 0x030303, wireframe: true, emissive: 0x111111, shiness: 0, side: THREE.DoubleSide } );
 
 // cloth geometry
@@ -143,18 +143,16 @@ sphere.visible = !true
 // arrow
 function initRenderer(){
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
-renderer.setPixelRatio( window.devicePixelRatio );
-renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setClearColor( scene.fog.color );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor( scene.fog.color );
 
-container.appendChild( renderer.domElement );
+	container.appendChild( renderer.domElement );
 
-renderer.gammaInput = true;
-renderer.gammaOutput = true;
+	renderer.gammaInput = true;
+	renderer.gammaOutput = true;
 
-renderer.shadowMapEnabled = true;
-
-//
+	renderer.shadowMapEnabled = true;
 
 stats = new Stats();
 container.appendChild( stats.domElement );
