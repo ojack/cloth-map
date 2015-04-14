@@ -1,5 +1,4 @@
-//var json = require('./data/data.json');
-
+var json = require('./data/data.json');
 var Z_DIST = 800;
 var rotate = false;
 window.addEventListener( 'resize', onWindowResize, false );
@@ -18,44 +17,15 @@ var sphere;
 var object, arrow;
 
 init();
-animate();
+
 /* testing cloth simulation */
-
-var pinsFormation = [];
-var pins = [6];
-
-pinsFormation.push( pins );
-
-//pins = [ 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20,22, 24, 26, 28, 30];
-//pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-pins = [0, 1, 2];
-pinsFormation.push( pins );
-
-pins = [ 0 ];
-pinsFormation.push( pins );
-
-pins = []; // cut the rope ;)
-pinsFormation.push( pins );
-
-pins = [ 0, cloth.w ]; // classic 2 pins
-pinsFormation.push( pins );
-
-pins = pinsFormation[ 1 ];
-
-
-function togglePins() {
-
-	pins = pinsFormation[ ~~( Math.random() * pinsFormation.length ) ];
-
-}
-
-
-
 function init() {
 
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
-	init3DScene();
+
+	OSMdata(json);
+	//init3DScene();
 
 } 
 
@@ -66,6 +36,7 @@ function init3DScene(){
 	initLights();
 	initObjects();
 	initRenderer();
+	animate();
 }
 
 function initCamera(){
@@ -116,7 +87,9 @@ clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
 clothGeometry.dynamic = true;
 clothGeometry.computeFaceNormals();
 
-
+cloth.addWind(clothGeometry.faces);
+var pins = [0, 2];
+cloth.addPins(pins);
 // cloth mesh
 
 object = new THREE.Mesh( clothGeometry, clothMaterial );

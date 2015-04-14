@@ -1,13 +1,18 @@
-function Particle(x, y, z, mass) {
+function Particle(x, y, z, mass, p) {
 	this.position = clothFunction(x, y);
 	this.previous = clothFunction(x, y); // previous
 	this.original = clothFunction(x, y); 
+	//debugger;
+	// this.positionP = p;
+	// this.previousP = p; WHY WONT P WORK?
+	// this.originalP = p;
 	//debugger;
 	this.a = new THREE.Vector3(0, 0, 0); // acceleration
 	this.mass = mass;
 	this.invMass = 1 / mass;
 	this.tmp = new THREE.Vector3();
 	this.tmp2 = new THREE.Vector3();
+	//debugger;
 }
 
 // Force -> Acceleration
@@ -19,9 +24,10 @@ Particle.prototype.addForce = function(force) {
 
 
 // Performs verlet integration
-Particle.prototype.integrate = function(timesq) {
+Particle.prototype.integrate = function(timesq, drag) {
+	//debugger;
 	var newPos = this.tmp.subVectors(this.position, this.previous);
-	newPos.multiplyScalar(DRAG).add(this.position);
+	newPos.multiplyScalar(drag).add(this.position);
 	newPos.add(this.a.multiplyScalar(timesq));
 
 	this.tmp = this.previous;

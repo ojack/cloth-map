@@ -10,8 +10,8 @@
 // http://cg.alexandra.dk/tag/spring-mass-system/
 // Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
 
-var DAMPING = 0.03;
-var DRAG = 1 - DAMPING;
+//var DAMPING = 0.03;
+//var DRAG = 1 - DAMPING;
 var MASS = .1;
 var restDistance = 25;
 
@@ -69,6 +69,8 @@ function Cloth(w, h) {
 	h = h || 10;
 	this.w = w;
 	this.h = h;
+	this.damping = 0.03;
+	this.drag = 1-this.damping;
 
 	this.particles = [];
 	this.constrains = [];
@@ -86,8 +88,9 @@ Cloth.prototype.createParticles = function(){
 	// Create particles
 	for (v = 0; v <= this.h; v ++) {
 		for (u = 0; u <= this.w; u ++) {
+			var p = clothFunction(u/ this.w, v / this.h);
 			this.particles.push(
-				new Particle((u+Math.random(0,10))/ this.w, v / this.h, 0, MASS)
+				new Particle(u/ this.w, v / this.h, 0, MASS, p)
 			);
 		}
 	}
@@ -133,6 +136,15 @@ Cloth.prototype.createLinkConstrains = function(){
 	}
 }
 
+Cloth.prototype.addWind = function(faces){
+	this.faces = faces;
+}
+
+Cloth.prototype.addPins = function(pins){
+	console.log(" pins are " + pins)
+	this.pins = pins;
+}
+
 Cloth.prototype.simulate = function(time) {
 	if (!lastTime) {
 		lastTime = time;
@@ -144,9 +156,9 @@ Cloth.prototype.simulate = function(time) {
 
 	// Aerodynamics forces
 	if (wind) {
-		var face, faces = clothGeometry.faces, normal;
+		var face, faces = this.faces, normal;
 
-		particles = cloth.particles;
+		particles = this.particles;
 
 		for (i = 0,il = faces.length; i < il; i ++) {
 			face = faces[i];
@@ -159,55 +171,55 @@ Cloth.prototype.simulate = function(time) {
 		}
 	}
 	
-	for (particles = cloth.particles, i = 0, il = particles.length
+	//add gravity
+	for (particles = this.particles, i = 0, il = particles.length
 			; i < il; i ++) {
 		particle = particles[i];
 		particle.addForce(gravity);
-
-		particle.integrate(TIMESTEP_SQ);
+		particle.integrate(TIMESTEP_SQ, this.drag);
 	}
 
-	// Start Constrains
+	// // Start Constrains
 
-	constrains = cloth.constrains,
+	constrains = this.constrains,
 	il = constrains.length;
 	for (i = 0; i < il; i ++) {
 		constrain = constrains[i];
 		satisifyConstrains(constrain[0], constrain[1], constrain[2]);
 	}
 
-	// Ball Constrains
+	// // Ball Constrains
 
 
-	ballPosition.z = -Math.sin(Date.now() / 600) * 90 ; //+ 40;
-	ballPosition.x = Math.cos(Date.now() / 400) * 70
+	// ballPosition.z = -Math.sin(Date.now() / 600) * 90 ; //+ 40;
+	// ballPosition.x = Math.cos(Date.now() / 400) * 70
 
-	if (sphere.visible)
-	for (particles = cloth.particles, i = 0, il = particles.length
-			; i < il; i ++) {
-		particle = particles[i];
-		pos = particle.position;
-		diff.subVectors(pos, ballPosition);
-		if (diff.length() < ballSize) {
-			// collided
-			diff.normalize().multiplyScalar(ballSize);
-			pos.copy(ballPosition).add(diff);
-		}
-	}
+	// if (sphere.visible)
+	// for (particles = cloth.particles, i = 0, il = particles.length
+	// 		; i < il; i ++) {
+	// 	particle = particles[i];
+	// 	pos = particle.position;
+	// 	diff.subVectors(pos, ballPosition);
+	// 	if (diff.length() < ballSize) {
+	// 		// collided
+	// 		diff.normalize().multiplyScalar(ballSize);
+	// 		pos.copy(ballPosition).add(diff);
+	// 	}
+	// }
 
-	// Floor Constains
-	for (particles = cloth.particles, i = 0, il = particles.length
-			; i < il; i ++) {
-		particle = particles[i];
-		pos = particle.position;
-		if (pos.y < -250) {
-			pos.y = -250;
-		}
-	}
+	// // Floor Constains
+	// for (particles = cloth.particles, i = 0, il = particles.length
+	// 		; i < il; i ++) {
+	// 	particle = particles[i];
+	// 	pos = particle.position;
+	// 	if (pos.y < -250) {
+	// 		pos.y = -250;
+	// 	}
+	// }
 
-	// Pin Constrains
-	for (i = 0, il = pins.length; i < il; i ++) {
-		var xy = pins[i];
+	// // Pin Constrains
+	for (i = 0, il = this.pins.length; i < il; i ++) {
+		var xy = this.pins[i];
 		var p = particles[xy];
 		p.position.copy(p.original);
 		p.previous.copy(p.original);
