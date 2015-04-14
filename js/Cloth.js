@@ -51,10 +51,6 @@ var tmpForce = new THREE.Vector3();
 
 var lastTime;
 
-
-
-
-
 var diff = new THREE.Vector3();
 
 function satisifyConstrains(p1, p2, distance) {
@@ -74,59 +70,10 @@ function Cloth(w, h) {
 	this.w = w;
 	this.h = h;
 
-	var particles = [];
-	var constrains = [];
+	this.particles = [];
+	this.constrains = [];
 
-	var u, v;
-
-	// Create particles
-	for (v = 0; v <= h; v ++) {
-		for (u = 0; u <= w; u ++) {
-			particles.push(
-				new Particle((u+Math.random(0,10))/ w, v / h, 0, MASS)
-			);
-		}
-	}
-
-	// Structural
-
-	for (v = 0; v < h; v ++) {
-		for (u = 0; u < w; u ++) {
-
-			constrains.push([
-				particles[index(u, v)],
-				particles[index(u, v + 1)],
-				particles[index(u, v)].position.distanceTo(particles[index(u, v + 1)].position)
-			]);
-
-			constrains.push([
-				particles[index(u, v)],
-				particles[index(u + 1, v)],
-				particles[index(u, v)].position.distanceTo(particles[index(u+1, v)].position)
-				//restDistance
-			]);
-
-		}
-	}
-
-	for (u = w, v = 0; v < h; v ++) {
-		constrains.push([
-			particles[index(u, v)],
-			particles[index(u, v + 1)],
-			particles[index(u, v)].position.distanceTo(particles[index(u, v + 1)].position)
-			//restDistance
-		]);
-	}
-
-	for (v = h, u = 0; u < w; u ++) {
-		constrains.push([
-			particles[index(u, v)],
-			particles[index(u + 1, v)],
-			particles[index(u, v)].position.distanceTo(particles[index(u+1, v)].position)
-			//restDistance
-		]);
-	}
-
+	
 
 	// While many system uses shear and bend springs,
 	// the relax constrains model seem to be just fine
@@ -154,14 +101,73 @@ function Cloth(w, h) {
 	// }
 
 
-	this.particles = particles;
-	this.constrains = constrains;
+	//this.particles = particles;
+	//this.constrains = constrains;
+	this.createParticles();
 
-	function index(u, v) {
-		return u + v * (w + 1);
+	
+
+	//this.index = index;
+
+}
+
+Cloth.prototype.index = function(i, j){
+	return i + j * (this.w + 1);
+}
+Cloth.prototype.createParticles = function(){
+	
+	
+	var u, v;
+	// Create particles
+	for (v = 0; v <= this.h; v ++) {
+		for (u = 0; u <= this.w; u ++) {
+			this.particles.push(
+				new Particle((u+Math.random(0,10))/ this.w, v / this.h, 0, MASS)
+			);
+		}
 	}
 
-	this.index = index;
+	// Structural
+
+	for (v = 0; v < this.h; v ++) {
+		for (u = 0; u < this.w; u ++) {
+			var thisParticle = this.particles[this.index(u, v)];
+			var nextParticle = this.particles[this.index(u, v+1)];
+			console.log(" u " + u + "v "+ v + "index " + this.index(u, v));
+			this.constrains.push([
+				this.particles[this.index(u, v)],
+				this.particles[this.index(u, v + 1)],
+				this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u, v + 1)].position)
+			]);
+
+			this.constrains.push([
+				this.particles[this.index(u, v)],
+				this.particles[this.index(u + 1, v)],
+				this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u+1, v)].position)
+				//restDistance
+			]);
+
+		}
+	}
+
+	for (u = this.w, v = 0; v < this.h; v ++) {
+		this.constrains.push([
+			this.particles[this.index(u, v)],
+			this.particles[this.index(u, v + 1)],
+			this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u, v + 1)].position)
+			//restDistance
+		]);
+	}
+
+	for (v = this.h, u = 0; u < this.w; u ++) {
+		this.constrains.push([
+			this.particles[this.index(u, v)],
+			this.particles[this.index(u + 1, v)],
+			this.particles[this.index(u, v)].position.distanceTo(this.particles[this.index(u+1, v)].position)
+			//restDistance
+		]);
+	}
+
 
 }
 
