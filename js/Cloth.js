@@ -13,11 +13,11 @@
 //var DAMPING = 0.03;
 //var DRAG = 1 - DAMPING;
 var MASS = .1;
-var restDistance = 25;
+var restDistance = 15;
 
 
-var xSegs = 4; //
-var ySegs = 4; //
+var xSegs = 40; //
+var ySegs = 40; //
 
 /* Parametric function representing the shape of the cloth. For more info, see: http://prideout.net/blog/?p=44*/
 var clothFunction = function(u, v){
@@ -72,6 +72,7 @@ function Cloth(w, h) {
 	this.damping = 0.03;
 	this.drag = 1-this.damping;
 
+
 	this.particles = [];
 	this.constrains = [];
 
@@ -83,17 +84,28 @@ Cloth.prototype.index = function(i, j){
 	return i + j * (this.w + 1);
 }
 
+//creates grid or net of particle locations//
 Cloth.prototype.createParticles = function(){
 	var u, v;
 	// Create particles
 	for (v = 0; v <= this.h; v ++) {
 		for (u = 0; u <= this.w; u ++) {
-			var p = clothFunction(u/ this.w, v / this.h);
+			var p = clothFunction(u/ this.w, v / this.h);//get rid of this
 			this.particles.push(
 				new Particle(u/ this.w, v / this.h, 0, MASS, p)
 			);
 		}
 	}
+}
+
+Cloth.prototype.addParticle = function(x , y){
+	var p = clothFunction(x, y); // get rid of this
+	this.particles.push(new Particle(x, y, 0, MASS, p));
+	return this.particles[this.particles.length-1];
+}
+
+Cloth.prototype.addLink = function(part1, part2){
+	this.constrains.push(part1, part2, part1.position.distanceTo(part2));
 }
 
 Cloth.prototype.createLinkConstrains = function(){
@@ -103,7 +115,7 @@ Cloth.prototype.createLinkConstrains = function(){
 		for (u = 0; u < this.w; u ++) {
 			var thisParticle = this.particles[this.index(u, v)];
 			var nextParticle = this.particles[this.index(u, v+1)];
-			console.log(" u " + u + "v "+ v + "index " + this.index(u, v));
+			//console.log(" u " + u + "v "+ v + "index " + this.index(u, v));
 			this.constrains.push([
 				this.particles[this.index(u, v)],
 				this.particles[this.index(u, v + 1)],
@@ -142,7 +154,11 @@ Cloth.prototype.addWind = function(faces){
 
 Cloth.prototype.addPins = function(pins){
 	console.log(" pins are " + pins)
-	this.pins = pins;
+	var arr = [];
+	for(var i = 0; i < xSegs; i++){
+		arr[i] = i;
+	}
+	this.pins = arr;
 }
 
 Cloth.prototype.simulate = function(time) {

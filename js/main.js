@@ -1,7 +1,7 @@
 var json = require('./data/data.json');
 var Z_DIST = 800;
 var rotate = false;
-window.addEventListener( 'resize', onWindowResize, false );
+
 
 
 
@@ -23,10 +23,9 @@ function init() {
 
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
-
-	OSMdata(json);
-	//init3DScene();
-
+	cloth = new Cloth(xSegs, ySegs);
+	//var data = new GeoData(json, cloth);
+	init3DScene();
 } 
 
 function init3DScene(){
@@ -37,6 +36,7 @@ function init3DScene(){
 	initObjects();
 	initRenderer();
 	animate();
+	window.addEventListener( 'resize', onWindowResize, false );
 }
 
 function initCamera(){
@@ -79,7 +79,7 @@ function initLights(){
 
 function initObjects(){
 	
-cloth = new Cloth(xSegs, ySegs);
+
 var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, color: 0xff0000, specular: 0x030303, wireframe: true, emissive: 0x111111, shiness: 0, side: THREE.DoubleSide } );
 
 // cloth geometry
