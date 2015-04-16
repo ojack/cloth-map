@@ -1,20 +1,18 @@
 var json = require('./data/data.json');
-var Z_DIST = 800;
+var Z_DIST = 900;
 var rotate = false;
-
-
-
 
 
 /*init vars */
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var container, stats;
-var camera, scene, renderer, cloth;
+var camera, scene, renderer, cloth, street_data;
 
 var clothGeometry;
 var sphere;
 var object, arrow;
+var mapGeometry;
 
 init();
 
@@ -24,7 +22,7 @@ function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	cloth = new Cloth(xSegs, ySegs);
-	//var data = new GeoData(json, cloth);
+	street_data = new GeoData(json, cloth);
 	init3DScene();
 } 
 
@@ -32,7 +30,7 @@ function init3DScene(){
 	scene = new THREE.Scene();
 	scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
 	initCamera();
-	initLights();
+	//initLights();
 	initObjects();
 	initRenderer();
 	animate();
@@ -41,7 +39,7 @@ function init3DScene(){
 
 function initCamera(){
 	camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.y = 50;
+	camera.position.y = 100;
 //	camera.position.z = 1500;
 	camera.position.z = Z_DIST;
 	scene.add( camera );
@@ -52,7 +50,7 @@ function initLights(){
 
 	scene.add( new THREE.AmbientLight( 0x666666 ) );
 
-	light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+	/*light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
 	light.position.set( 50, 200, 100 );
 	light.position.multiplyScalar( 1.3 );
 
@@ -72,7 +70,7 @@ function initLights(){
 	light.shadowCameraFar = 1000;
 	light.shadowDarkness = 0.5;
 
-	scene.add( light );
+	scene.add( light );*/
 
 }
 
@@ -80,45 +78,75 @@ function initLights(){
 function initObjects(){
 	
 
-var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, color: 0xff0000, specular: 0x030303, wireframe: true, emissive: 0x111111, shiness: 0, side: THREE.DoubleSide } );
+	/*var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, color: 0xff0000, specular: 0x030303, wireframe: true, emissive: 0x111111, shiness: 0, side: THREE.DoubleSide } );
 
-// cloth geometry
-clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
-clothGeometry.dynamic = true;
-clothGeometry.computeFaceNormals();
+	// cloth geometry
+	clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
+	clothGeometry.dynamic = true;
+	clothGeometry.computeFaceNormals();
 
-cloth.addWind(clothGeometry.faces);
-var pins = [0, 2];
-cloth.addPins(pins);
-// cloth mesh
+	cloth.addWind(clothGeometry.faces);
+	var pins = [0, 2];
+	cloth.addPins(pins);
+	// cloth mesh
 
-object = new THREE.Mesh( clothGeometry, clothMaterial );
-object.position.set( 0, 0, 0 );
-object.castShadow = true;
-object.receiveShadow = true;
-scene.add( object );
+	object = new THREE.Mesh( clothGeometry, clothMaterial );
+	object.position.set( 0, 0, 0 );
+	object.castShadow = true;
+	object.receiveShadow = true;
+	scene.add( object );*/
 
 
 
-// sphere
+	// sphere
 
-var ballGeo = new THREE.SphereGeometry( ballSize, 20, 20 );
-var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+	var ballGeo = new THREE.SphereGeometry( ballSize, 20, 20 );
+	var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
 
-sphere = new THREE.Mesh( ballGeo, ballMaterial );
-sphere.castShadow = true;
-sphere.receiveShadow = true;
-scene.add( sphere );
-sphere.visible = !true
+	sphere = new THREE.Mesh( ballGeo, ballMaterial );
+	sphere.castShadow = true;
+	sphere.receiveShadow = true;
+	scene.add( sphere );
+	sphere.visible = !true;
+
+	console.log(" added objects");
+
+	drawLines();
 }
 
+function drawLines(){
+	var material = new THREE.LineBasicMaterial({
+		color: 0x000000,
+		linewidth: 1,
+		linevertex: 0xff0000
+	});
+
+	mapGeometry = new THREE.Geometry();
+	/*geometry.vertices.push(
+		new THREE.Vector3( -10, 0, 0 ),
+		new THREE.Vector3( 0, 10, 0 ),
+		new THREE.Vector3( 10, 0, 0 )
+	);*/
+
+	var lineLocs = street_data.getLinks();
+	for(var i = 0; i < lineLocs.length; i++){
+		mapGeometry.vertices.push(lineLocs[i]);
+		//console.log(JSON.stringify(lineLocs[i]));
+	}
+
+	var line = new THREE.Line( mapGeometry, material, THREE.LinePieces);
+	//cloth.addWind(clothGeometry.faces);
+	var pins = [0, 2];
+	cloth.addPins(pins);
+	scene.add( line );
+}
 
 // arrow
 function initRenderer(){
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setClearColor( scene.fog.color );
+	renderer.setClearColor( 0xffffff );
 
 	container.appendChild( renderer.domElement );
 
@@ -171,21 +199,22 @@ function render() {
 
 	var timer = Date.now() * 0.0002;
 
-	var p = cloth.particles;
+	var part = cloth.particles;
+	//TO DO: learn what this is doing//generate irregular mesh
+	var mapVert = mapGeometry.vertices.length;
+	for ( var i = 0, il = mapVert.length; i < il; i ++ ) {
 
-	for ( var i = 0, il = p.length; i < il; i ++ ) {
-
-		clothGeometry.vertices[ i ].copy( p[ i ].position );
+		mapGeometry.vertices[ i ].copy( part[ i ].position );
 
 	}
 
-	clothGeometry.computeFaceNormals();
-	clothGeometry.computeVertexNormals();
+	//clothGeometry.computeFaceNormals();
+	//clothGeometry.computeVertexNormals();
 
-	clothGeometry.normalsNeedUpdate = true;
-	clothGeometry.verticesNeedUpdate = true;
+	//clothGeometry.normalsNeedUpdate = true;
+	mapGeometry.verticesNeedUpdate = true;
 
-	sphere.position.copy( ballPosition );
+	//sphere.position.copy( ballPosition );
 
 	if ( rotate ) {
 

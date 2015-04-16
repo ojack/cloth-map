@@ -12,25 +12,32 @@
 
 //var DAMPING = 0.03;
 //var DRAG = 1 - DAMPING;
-var MASS = .1;
+var MASS = 100;
 var restDistance = 15;
-
+var DAMP = 0.001;
+var DRAG = 0.1;
 
 var xSegs = 40; //
 var ySegs = 40; //
 
 /* Parametric function representing the shape of the cloth. For more info, see: http://prideout.net/blog/?p=44*/
 var clothFunction = function(u, v){
-	var x = (u - 0.5) * restDistance * xSegs;
-		var y = (v + 0.5) *  restDistance * ySegs;
-		var z = 0;
+//	var x = (u - 0.5) * restDistance * xSegs;
+	//	var y = (v + 0.5) *  restDistance * ySegs;
+
+	// var x = u * restDistance*xSegs;
+	// var y = v * restDistance*ySegs;
+		var x = u;
+	    var y = v;
+		var z = 0.0;
 
 		return new THREE.Vector3(x, y, z);
 }
 
 
 
-var GRAVITY = 981 * 1.4; // 
+//var GRAVITY = 981 * 1.4; // what gravity should be
+var GRAVITY = 200;
 var gravity = new THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 
 
@@ -69,15 +76,15 @@ function Cloth(w, h) {
 	h = h || 10;
 	this.w = w;
 	this.h = h;
-	this.damping = 0.03;
-	this.drag = 1-this.damping;
+	this.damping = DAMP;
+	this.drag = DRAG;
 
 
 	this.particles = [];
 	this.constrains = [];
 
-	this.createParticles();
-	this.createLinkConstrains();
+	//this.createParticles();
+	//this.createLinkConstrains();
 }
 
 Cloth.prototype.index = function(i, j){
@@ -105,7 +112,11 @@ Cloth.prototype.addParticle = function(x , y){
 }
 
 Cloth.prototype.addLink = function(part1, part2){
-	this.constrains.push(part1, part2, part1.position.distanceTo(part2));
+	//var dist = part1.position.distanceTo()
+	if(part1==undefined) debugger;
+	if(part2==undefined) debugger;
+	this.constrains.push([part1, part2, part1.position.distanceTo(part2.position)]);
+	console.log("ths link " + JSON.stringify(this.constrains[0]));
 }
 
 Cloth.prototype.createLinkConstrains = function(){
@@ -155,7 +166,7 @@ Cloth.prototype.addWind = function(faces){
 Cloth.prototype.addPins = function(pins){
 	console.log(" pins are " + pins)
 	var arr = [];
-	for(var i = 0; i < xSegs; i++){
+	for(var i = 0; i < 10; i++){
 		arr[i] = i;
 	}
 	this.pins = arr;
@@ -171,7 +182,7 @@ Cloth.prototype.simulate = function(time) {
 	var i, il, particles, particle, pt, constrains, constrain;
 
 	// Aerodynamics forces
-	if (wind) {
+	/*if (wind) {
 		var face, faces = this.faces, normal;
 
 		particles = this.particles;
@@ -185,7 +196,7 @@ Cloth.prototype.simulate = function(time) {
 			particles[face.b].addForce(tmpForce);
 			particles[face.c].addForce(tmpForce);
 		}
-	}
+	}*/
 	
 	//add gravity
 	for (particles = this.particles, i = 0, il = particles.length
@@ -201,6 +212,7 @@ Cloth.prototype.simulate = function(time) {
 	il = constrains.length;
 	for (i = 0; i < il; i ++) {
 		constrain = constrains[i];
+		//console.log(constrain.position);
 		satisifyConstrains(constrain[0], constrain[1], constrain[2]);
 	}
 
@@ -234,9 +246,15 @@ Cloth.prototype.simulate = function(time) {
 	// }
 
 	// // Pin Constrains
-	for (i = 0, il = this.pins.length; i < il; i ++) {
+	/*for (i = 0, il = this.pins.length; i < il; i ++) {
 		var xy = this.pins[i];
 		var p = particles[xy];
+		p.position.copy(p.original);
+		p.previous.copy(p.original);
+	}*/
+	/*pin first 10 points to original location*/
+	for(var i = 0; i < particles.length; i+=10){
+		var p = particles[i];
 		p.position.copy(p.original);
 		p.previous.copy(p.original);
 	}
