@@ -1,8 +1,8 @@
 /*Load Open Street map Data from a JSON file. */
 
 var boundingBox = {s: 40.71849,w: -74.0044,n: 40.722638,e:-73.99832};
-var maxY = 500;
-var maxX = 500;
+var maxY = 100;
+var maxX = 100;
 
 
 
@@ -60,6 +60,7 @@ GeoData.prototype.addNode = function(node){
 GeoData.prototype.addLinks = function(link){
 	var net = link.nodes;
 	var foundNode = false;
+	//if(link.tags["highway"]!=null){
 	for(var i = 0; i < net.length-1; i++){
 		if(this.nodes[net[i]]!=undefined){
 			if(this.nodes[net[i+1]]!=undefined){
@@ -72,8 +73,9 @@ GeoData.prototype.addLinks = function(link){
 		}
 		//if(nodes[net[i]]!=)
 	}
-	return foundNode;
 }
+	//return foundNode;
+//}
 
 GeoData.prototype.getLinks = function(){
 	return this.links;
@@ -82,11 +84,11 @@ GeoData.prototype.getLinks = function(){
 //TO DO: use projection
 function latToY(lat){
 	var len = (lat-boundingBox.s)/(boundingBox.n-boundingBox.s);
-	return len*maxY-200;
+	return len*maxY-maxY/2;
 }
 
 function lonToX(lon){
 	var len = (lon-boundingBox.w)/(boundingBox.e-boundingBox.w);
-	return len*maxX-200;
+	return len*maxX-maxX/2;
 
 }

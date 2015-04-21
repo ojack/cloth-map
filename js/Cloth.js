@@ -14,9 +14,9 @@
 //var DRAG = 1 - DAMPING;
 var MASS = 100;
 var restDistance = 15;
-var DAMP = 0.001;
-var DRAG = 0.1;
-
+var DAMP = 0.01;
+var DRAG = 0.99;
+var mouse_influence = 30;
 var xSegs = 40; //
 var ySegs = 40; //
 
@@ -37,8 +37,8 @@ var clothFunction = function(u, v){
 
 
 //var GRAVITY = 981 * 1.4; // what gravity should be
-var GRAVITY = 200;
-var gravity = new THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
+var GRAVITY = 0;
+var gravity = new THREE.Vector3( 0, -GRAVITY, 0).multiplyScalar(MASS);
 
 
 var TIMESTEP = 18 / 1000;
@@ -58,9 +58,10 @@ var tmpForce = new THREE.Vector3();
 
 var lastTime;
 
-var diff = new THREE.Vector3();
+
 
 function satisifyConstrains(p1, p2, distance) {
+	var diff = new THREE.Vector3();
 	diff.subVectors(p2.position, p1.position);
 	var currentDist = diff.length();
 	if (currentDist == 0) return; // prevents division by 0
@@ -69,6 +70,7 @@ function satisifyConstrains(p1, p2, distance) {
 	p1.position.add(correctionHalf);
 	p2.position.sub(correctionHalf);
 }
+
 
 
 function Cloth(w, h) {
@@ -82,7 +84,13 @@ function Cloth(w, h) {
 
 	this.particles = [];
 	this.constrains = [];
-
+	this.mouse = {
+		down: false,
+        button: 1,
+       position: new THREE.Vector3(),
+       previous: new THREE.Vector3(),
+       diff: new THREE.Vector3(0, 0, 0)
+	}
 	//this.createParticles();
 	//this.createLinkConstrains();
 }
@@ -116,7 +124,7 @@ Cloth.prototype.addLink = function(part1, part2){
 	if(part1==undefined) debugger;
 	if(part2==undefined) debugger;
 	this.constrains.push([part1, part2, part1.position.distanceTo(part2.position)]);
-	console.log("ths link " + JSON.stringify(this.constrains[0]));
+	//console.log("ths link " + JSON.stringify(this.constrains[0]));
 }
 
 Cloth.prototype.createLinkConstrains = function(){
@@ -159,17 +167,43 @@ Cloth.prototype.createLinkConstrains = function(){
 	}
 }
 
+Cloth.prototype.addMouseForce = function(mousePos){
+	this.mouse.down = true;
+	this.mouse.position.x = mousePos.x;
+	this.mouse.position.y = mousePos.y;
+	this.mouse.position.z = 0;
+	this.mouse.previous.copy(this.mouse.position);
+}
+
+Cloth.prototype.updateMouseForce = function(mousePos){
+	//this.mouse.previous = this.mouse.position;
+	this.mouse.previous.copy(this.mouse.position);
+	this.mouse.position.x = mousePos.x;
+	this.mouse.position.y = mousePos.y;
+	this.mouse.position.z = 0;
+	this.mouse.diff.subVectors(this.mouse.position, this.mouse.previous);
+//	console.log("previous " + JSON.stringify(this.mouse.previous) + " current " + JSON.stringify(this.mouse.position) + "diff " + JSON.stringify(this.mouse.diff));
+	
+	
+}
+
+Cloth.prototype.removeMouseForce = function(mousePos){
+	this.mouse.down = false;
+	//this.mouse.diff = new THREE.Vector3(0, 0, 0);
+}
+
+
 Cloth.prototype.addWind = function(faces){
 	this.faces = faces;
 }
 
 Cloth.prototype.addPins = function(pins){
-	console.log(" pins are " + pins)
-	var arr = [];
+	//console.log(" pins are " + pins)
+	/*var arr = [];
 	for(var i = 0; i < 10; i++){
 		arr[i] = i;
 	}
-	this.pins = arr;
+	this.pins = arr;*/
 }
 
 Cloth.prototype.simulate = function(time) {
@@ -202,7 +236,9 @@ Cloth.prototype.simulate = function(time) {
 	for (particles = this.particles, i = 0, il = particles.length
 			; i < il; i ++) {
 		particle = particles[i];
+		particle.snapBack();
 		particle.addForce(gravity);
+		if(this.mouse.down) particle.mouseUpdate(this.mouse.position, this.mouse.diff);
 		particle.integrate(TIMESTEP_SQ, this.drag);
 	}
 
@@ -253,11 +289,11 @@ Cloth.prototype.simulate = function(time) {
 		p.previous.copy(p.original);
 	}*/
 	/*pin first 10 points to original location*/
-	for(var i = 0; i < particles.length; i+=10){
+	/*for(var i = 0; i < particles.length; i+=80){
 		var p = particles[i];
 		p.position.copy(p.original);
 		p.previous.copy(p.original);
-	}
+	}*/
 
 
 }

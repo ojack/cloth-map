@@ -1,18 +1,19 @@
-var json = require('./data/data.json');
-var Z_DIST = 900;
-var rotate = false;
+var json = require('./data/streets.json');
+var Z_DIST = 2000;
+var rotate = !true;
 
 
 /*init vars */
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var container, stats;
-var camera, scene, renderer, cloth, street_data;
+var camera, scene, renderer, cloth, street_data, raycaster;
 
 var clothGeometry;
 var sphere;
 var object, arrow;
 var mapGeometry;
+var objects = [];
 
 init();
 
@@ -33,8 +34,13 @@ function init3DScene(){
 	//initLights();
 	initObjects();
 	initRenderer();
+	mouse = new THREE.Vector2();
+	raycaster = new THREE.Raycaster();
+	raycaster.linePrecision = 20;
 	animate();
 	window.addEventListener( 'resize', onWindowResize, false );
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+	document.addEventListener( 'mouseup', onMouseUp, false );
 }
 
 function initCamera(){
@@ -74,6 +80,71 @@ function initLights(){
 
 }
 
+function onDocumentMouseDown( event ) {
+
+	event.preventDefault();
+
+	mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+
+	raycaster.setFromCamera( mouse, camera );
+
+	var intersects = raycaster.intersectObjects( objects, true );
+	console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
+
+	if ( intersects.length > 0 ) {
+
+		//intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+		cloth.addMouseForce(intersects[0].point);
+		/*var particle = new THREE.Sprite( particleMaterial );
+		particle.position.copy( intersects[ 0 ].point );
+		particle.scale.x = particle.scale.y = 16;
+		scene.add( particle );*/
+		//console.log(" intersect at " + JSON.stringify(intersects[0]));
+
+	}
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+	/*
+	// Parse all the faces
+	for ( var i in intersects ) {
+
+		intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+
+	}
+	*/
+}
+
+function onDocumentMouseMove( event ) {
+
+	event.preventDefault();
+
+	mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+
+	raycaster.setFromCamera( mouse, camera );
+
+	var intersects = raycaster.intersectObjects( objects, true );
+	console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
+	
+	if ( intersects.length > 0 ) {
+		cloth.updateMouseForce(intersects[0].point);
+		//intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+	//	cloth.updateMouseForce(mouse);
+		/*var particle = new THREE.Sprite( particleMaterial );
+		particle.position.copy( intersects[ 0 ].point );
+		particle.scale.x = particle.scale.y = 16;
+		scene.add( particle );*/
+		//console.log(" intersect at " + JSON.stringify(intersects[0]));
+
+	}
+	
+
+}
+
+function onMouseUp(){
+	document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+	cloth.removeMouseForce();
+}
 
 function initObjects(){
 	
@@ -136,9 +207,9 @@ function drawLines(){
 
 	var line = new THREE.Line( mapGeometry, material, THREE.LinePieces);
 	//cloth.addWind(clothGeometry.faces);
-	var pins = [0, 2];
-	cloth.addPins(pins);
+	
 	scene.add( line );
+	objects.push(line);
 }
 
 // arrow

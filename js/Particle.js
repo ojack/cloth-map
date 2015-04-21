@@ -22,9 +22,38 @@ Particle.prototype.addForce = function(force) {
 	);
 };
 
+Particle.prototype.mouseUpdate = function(mousePos, mouseDiff) {
+
+	var thisDist = this.position.distanceTo(mousePos);
+	if(thisDist < mouse_influence){
+		//console.log("updating ");
+		//var mouseDiff = this.tmp.subVectors(mousePrevious, mousePos)
+		mouseDiff.multiplyScalar(1.0);
+		this.previous.subVectors(this.position, mouseDiff);
+	}
+}
+
+Particle.prototype.snapBack = function(){
+	var diff = new THREE.Vector3();
+	diff.subVectors(this.position, this.original);
+
+	//var correction = diff.multiplyScalar(1 - distance / currentDist);
+	var correctionHalf = diff.multiplyScalar(0.002);
+	this.position.sub(correctionHalf);
+}
+/*function backToOriginal(p1){
+	var diff = new THREE.Vector3();
+	diff.subVectors(p1.position, p1.original);
+
+	//var correction = diff.multiplyScalar(1 - distance / currentDist);
+	var correctionHalf = diff.multiplyScalar(0.5);
+	p1.position.add(correctionHalf);
+	//p2.position.sub(correctionHalf);
+}*/
 
 // Performs verlet integration
 Particle.prototype.integrate = function(timesq, drag) {
+
 	//debugger;
 	var newPos = this.tmp.subVectors(this.position, this.previous);
 	newPos.multiplyScalar(drag).add(this.position);
@@ -36,3 +65,4 @@ Particle.prototype.integrate = function(timesq, drag) {
 
 	this.a.set(0, 0, 0);
 }
+
