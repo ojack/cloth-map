@@ -39,7 +39,7 @@ function init3DScene(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 	document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-	document.addEventListener( 'touchmove', onDocumentTouchEnd, false );
+	
 	document.addEventListener( 'touchend', onDocumentTouchEnd, false );
 	document.addEventListener( 'mouseup', onMouseUp, false );
 	document.onkeydown = checkKey;
@@ -144,18 +144,21 @@ function onWindowResize() {
 
 }
 
-function onDocumentTouchMove( event ) {
-				
+function onDocumentTouchMove( event ) {		
 				event.preventDefault();
-				
 				event.clientX = event.touches[0].clientX;
 				event.clientY = event.touches[0].clientY;
-				onDocumentMouseMove( event );
-
+			mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+	var intersects = raycaster.intersectObjects( objects, true );	
+	if ( intersects.length > 0 ) {
+		cloth.updateMouseForce(intersects[0].point);
+	}
 }
 
 function onDocumentTouchEnd(  ) {
-			document.removeEventListener( 'touchmove', onDocumentMouseMove, false );
+			document.removeEventListener( 'touchmove', onDocumentTouchMove, false );
 	cloth.removeMouseForce();
 }
 
@@ -165,7 +168,15 @@ function onDocumentTouchStart( event ) {
 				
 				event.clientX = event.touches[0].clientX;
 				event.clientY = event.touches[0].clientY;
-				onDocumentMouseDown( event );
+				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+	var intersects = raycaster.intersectObjects( objects, true );
+	//console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
+	if ( intersects.length > 0 ) {
+		cloth.addMouseForce(intersects[0].point);
+	}
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 }
 
@@ -175,7 +186,7 @@ function onDocumentMouseDown( event ) {
 	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 	raycaster.setFromCamera( mouse, camera );
 	var intersects = raycaster.intersectObjects( objects, true );
-	console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
+	//console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
 	if ( intersects.length > 0 ) {
 		cloth.addMouseForce(intersects[0].point);
 	}
