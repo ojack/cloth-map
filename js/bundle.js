@@ -135665,6 +135665,9 @@ function init3DScene(){
 	animate();
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+	document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+	document.addEventListener( 'touchmove', onDocumentTouchEnd, false );
+	document.addEventListener( 'touchend', onDocumentTouchEnd, false );
 	document.addEventListener( 'mouseup', onMouseUp, false );
 	document.onkeydown = checkKey;
 }
@@ -135736,7 +135739,6 @@ function render() {
 	mapGeometry.verticesNeedUpdate = true;
 
 	if ( rotate ) {
-
 		camera.position.x = Math.cos( timer ) * Z_DIST;
 		camera.position.z = Math.sin( timer ) * Z_DIST;
 
@@ -135766,6 +135768,31 @@ function onWindowResize() {
 	camera.updateProjectionMatrix();
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+function onDocumentTouchMove( event ) {
+				
+				event.preventDefault();
+				
+				event.clientX = event.touches[0].clientX;
+				event.clientY = event.touches[0].clientY;
+				onDocumentMouseMove( event );
+
+}
+
+function onDocumentTouchEnd(  ) {
+			document.removeEventListener( 'touchmove', onDocumentMouseMove, false );
+	cloth.removeMouseForce();
+}
+
+function onDocumentTouchStart( event ) {
+				
+				event.preventDefault();
+				
+				event.clientX = event.touches[0].clientX;
+				event.clientY = event.touches[0].clientY;
+				onDocumentMouseDown( event );
 
 }
 
