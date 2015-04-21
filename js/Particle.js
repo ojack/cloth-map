@@ -33,6 +33,8 @@ Particle.prototype.mouseUpdate = function(mousePos, mouseDiff) {
 	}
 }
 
+//moves particle back towards original position
+
 Particle.prototype.snapBack = function(){
 	var diff = new THREE.Vector3();
 	diff.subVectors(this.position, this.original);
@@ -41,15 +43,7 @@ Particle.prototype.snapBack = function(){
 	var correctionHalf = diff.multiplyScalar(0.002);
 	this.position.sub(correctionHalf);
 }
-/*function backToOriginal(p1){
-	var diff = new THREE.Vector3();
-	diff.subVectors(p1.position, p1.original);
 
-	//var correction = diff.multiplyScalar(1 - distance / currentDist);
-	var correctionHalf = diff.multiplyScalar(0.5);
-	p1.position.add(correctionHalf);
-	//p2.position.sub(correctionHalf);
-}*/
 
 // Performs verlet integration
 Particle.prototype.integrate = function(timesq, drag) {
