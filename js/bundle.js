@@ -135626,9 +135626,9 @@ module.exports={
 
 },{}],2:[function(require,module,exports){
 var json = require('./data/streets.json');
-var Z_DIST = 2000;
+var Z_DIST = 1900;
 var rotate = !true;
-
+var forceMove = 0;
 
 /*init vars */
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -135651,6 +135651,8 @@ function init() {
 	cloth = new Cloth(xSegs, ySegs);
 	street_data = new GeoData(json, cloth);
 	init3DScene();
+	//cloth.addMouseForce(new THREE.Vector2( forceMove, 1 ));
+	
 } 
 
 function init3DScene(){
@@ -135666,7 +135668,7 @@ function init3DScene(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 	document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-	document.addEventListener( 'touchmove', onDocumentTouchEnd, false );
+	
 	document.addEventListener( 'touchend', onDocumentTouchEnd, false );
 	document.addEventListener( 'mouseup', onMouseUp, false );
 	document.onkeydown = checkKey;
@@ -135717,6 +135719,10 @@ function initRenderer(){
 
 /* Called via requestAnimationFrame() when ready to update positions*/
 function animate() {
+	/* add initial movement */
+	//forceMove++;
+	//cloth.updateMouseForce(new THREE.Vector2( forceMove, 1 ));
+
 	requestAnimationFrame( animate );
 	var time = Date.now();
 	cloth.simulate(time);
@@ -135771,28 +135777,39 @@ function onWindowResize() {
 
 }
 
-function onDocumentTouchMove( event ) {
-				
+function onDocumentTouchMove( event ) {		
 				event.preventDefault();
-				
 				event.clientX = event.touches[0].clientX;
 				event.clientY = event.touches[0].clientY;
-				onDocumentMouseMove( event );
-
+			mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+	var intersects = raycaster.intersectObjects( objects, true );	
+	if ( intersects.length > 0 ) {
+		cloth.updateMouseForce(intersects[0].point);
+	}
 }
 
 function onDocumentTouchEnd(  ) {
-			document.removeEventListener( 'touchmove', onDocumentMouseMove, false );
+			document.removeEventListener( 'touchmove', onDocumentTouchMove, false );
 	cloth.removeMouseForce();
 }
 
 function onDocumentTouchStart( event ) {
-				
+				console.log("touch down");
 				event.preventDefault();
 				
 				event.clientX = event.touches[0].clientX;
 				event.clientY = event.touches[0].clientY;
-				onDocumentMouseDown( event );
+				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+	var intersects = raycaster.intersectObjects( objects, true );
+	//console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
+	if ( intersects.length > 0 ) {
+		cloth.addMouseForce(intersects[0].point);
+	}
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 }
 
@@ -135802,7 +135819,7 @@ function onDocumentMouseDown( event ) {
 	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 	raycaster.setFromCamera( mouse, camera );
 	var intersects = raycaster.intersectObjects( objects, true );
-	console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
+	//console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
 	if ( intersects.length > 0 ) {
 		cloth.addMouseForce(intersects[0].point);
 	}

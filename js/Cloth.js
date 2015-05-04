@@ -7,9 +7,10 @@ var MASS = 1;
 var restDistance = 15;
 var DAMP = 0.01;
 var DRAG = 0.99;
-var mouse_influence = 30;
+var mouse_influence = 40;
 var xSegs = 40; //
 var ySegs = 40; //
+var forceDown = 600;
 
 /* Parametric function representing the shape of the cloth. For more info, see: http://prideout.net/blog/?p=44*/
 var clothFunction = function(u, v){
@@ -54,7 +55,7 @@ function Cloth(w, h) {
 	this.damping = DAMP;
 	this.drag = DRAG;
 
-
+	this.external_force = new THREE.Vector3(0, 0, 0);
 	this.particles = [];
 	this.constrains = [];
 	this.mouse = {
@@ -108,6 +109,10 @@ Cloth.prototype.updateMouseForce = function(mousePos){
 	
 }
 
+Cloth.prototype.addExternalForce = function(posVec){
+
+}
+
 Cloth.prototype.removeMouseForce = function(mousePos){
 	this.mouse.down = false;
 	this.mouse.diff = new THREE.Vector3(0, 0, 0);
@@ -124,9 +129,10 @@ Cloth.prototype.simulate = function(time) {
 	
 	var particles = this.particles;
 	var i, il, particles, particle, pt, constrains, constrain;
-
-	
-	
+	forceDown -= 40; 
+	var forceLoc = new THREE.Vector3(200, forceDown, 0);
+	//var forceDir = new THREE.Vector3(100-forceDown, 100-forceDown, 5);
+	var forceDir = new THREE.Vector3(4, 4, 0);
 	//add gravity
 	for (particles = this.particles, i = 0, il = particles.length
 			; i < il; i ++) {
@@ -134,9 +140,17 @@ Cloth.prototype.simulate = function(time) {
 		particle.snapBack();
 		particle.addForce(gravity);
 		if(this.mouse.down) particle.mouseUpdate(this.mouse.position, this.mouse.diff);
+
+		// downward force at the beginning
+		if(forceDown > -1000) particle.mouseUpdate(forceLoc, forceDir);
+
 		particle.integrate(TIMESTEP_SQ, this.drag);
+
+
 	}
 
+
+	//apply external force 
 	// // Start Constrains
 
 	constrains = this.constrains,

@@ -1,7 +1,7 @@
 var json = require('./data/streets.json');
-var Z_DIST = 2000;
+var Z_DIST = 1900;
 var rotate = !true;
-
+var forceMove = 0;
 
 /*init vars */
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -24,6 +24,8 @@ function init() {
 	cloth = new Cloth(xSegs, ySegs);
 	street_data = new GeoData(json, cloth);
 	init3DScene();
+	//cloth.addMouseForce(new THREE.Vector2( forceMove, 1 ));
+	
 } 
 
 function init3DScene(){
@@ -90,6 +92,10 @@ function initRenderer(){
 
 /* Called via requestAnimationFrame() when ready to update positions*/
 function animate() {
+	/* add initial movement */
+	//forceMove++;
+	//cloth.updateMouseForce(new THREE.Vector2( forceMove, 1 ));
+
 	requestAnimationFrame( animate );
 	var time = Date.now();
 	cloth.simulate(time);
@@ -163,7 +169,7 @@ function onDocumentTouchEnd(  ) {
 }
 
 function onDocumentTouchStart( event ) {
-				
+				console.log("touch down");
 				event.preventDefault();
 				
 				event.clientX = event.touches[0].clientX;
