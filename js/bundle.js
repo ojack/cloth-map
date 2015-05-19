@@ -135788,6 +135788,7 @@ function onDocumentTouchMove( event ) {
 			//	var x = (event.touches[i].clientX/ renderer.domElement.width ) * 2 - 1;
 			//	var y = (event.touches[i].clientY / renderer.domElement.height ) * 2 + 1;
 			addCube(get3Dpoint(event.touches[i].clientX, event.touches[i].clientY));
+			console.log(event.touches[i]);
 			/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
 			mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 			raycaster.setFromCamera( mouse, camera );
@@ -135799,7 +135800,7 @@ function onDocumentTouchMove( event ) {
 }
 
 function addCube(point){
-	console.log(point);
+//	console.log(point);
    var geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
    var material = new THREE.MeshBasicMaterial( { color: 0x000000 } );

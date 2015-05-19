@@ -41,7 +41,7 @@ function init3DScene(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 	document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-	
+	document.addEventListener( 'toucstart', onDocumentTouchStart, false );
 	//document.addEventListener( 'touchend', onDocumentTouchEnd, false );
 	document.addEventListener( 'mouseup', onMouseUp, false );
 	document.onkeydown = checkKey;
@@ -152,6 +152,29 @@ function onWindowResize() {
 
 }
 
+var touches = {};
+
+function onTouchStart( event){
+		for(var i = 0; i < event.touches.length; i++){
+				//event.clientX = event.touches[0].clientX;
+			//	event.clientY = event.touches[0].clientY;
+			//	var x = (event.touches[i].clientX/ renderer.domElement.width ) * 2 - 1;
+			//	var y = (event.touches[i].clientY / renderer.domElement.height ) * 2 + 1;
+			var point = get3Dpoint(event.touches[i].clientX, event.touches[i].clientY);
+			var touchObj = {curr: point, prev: point};
+
+			touches[event.touched[i].identity] = touchObj;
+			addCube(get3Dpoint(event.touches[i].clientX, event.touches[i].clientY));
+			console.log(touches);
+			/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+			mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+			raycaster.setFromCamera( mouse, camera );
+			var intersects = raycaster.intersectObjects( objects, true );	
+			if ( intersects.length > 0 ) {
+				cloth.updateMouseForce(intersects[0].point);
+			}*/
+		}
+}
 function onDocumentTouchMove( event ) {		
 				event.preventDefault();
 
@@ -160,7 +183,12 @@ function onDocumentTouchMove( event ) {
 			//	event.clientY = event.touches[0].clientY;
 			//	var x = (event.touches[i].clientX/ renderer.domElement.width ) * 2 - 1;
 			//	var y = (event.touches[i].clientY / renderer.domElement.height ) * 2 + 1;
+			var point = get3Dpoint(event.touches[i].clientX, event.touches[i].clientY);
+			var touchObj = {curr: point, prev: point};
+
+			touches[event.touched[i].identity] = touchObj;
 			addCube(get3Dpoint(event.touches[i].clientX, event.touches[i].clientY));
+			console.log(event.touches[i]);
 			/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
 			mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 			raycaster.setFromCamera( mouse, camera );
@@ -172,7 +200,7 @@ function onDocumentTouchMove( event ) {
 }
 
 function addCube(point){
-	console.log(point);
+//	console.log(point);
    var geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
    var material = new THREE.MeshBasicMaterial( { color: 0x000000 } );

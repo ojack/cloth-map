@@ -54,7 +54,6 @@ function Cloth(w, h) {
 	this.h = h;
 	this.damping = DAMP;
 	this.drag = DRAG;
-
 	this.external_force = new THREE.Vector3(0, 0, 0);
 	this.particles = [];
 	this.constrains = [];
@@ -89,7 +88,7 @@ Cloth.prototype.addLink = function(part1, part2){
 }
 
 
-Cloth.prototype.addMouseForce = function(mousePos){
+Cloth.prototype.addMouseForce = function(mousePos, index){
 	this.mouse.down = true;
 	this.mouse.position.x = mousePos.x;
 	this.mouse.position.y = mousePos.y;
