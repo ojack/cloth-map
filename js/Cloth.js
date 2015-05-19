@@ -7,7 +7,7 @@ var MASS = 1;
 var restDistance = 15;
 var DAMP = 0.01;
 var DRAG = 0.99;
-var mouse_influence = 40;
+var mouse_influence = 20;
 var xSegs = 40; //
 var ySegs = 40; //
 var forceDown = 600;
@@ -114,17 +114,18 @@ Cloth.prototype.addExternalForce = function(index, position){
 	var prevPos = position;
 	var diff = new THREE.Vector3(0, 0, 0);
 	this.forces[index] = {position: currPos, previous: prevPos, diff: diff};
-	console.log("adding external force");
-	console.log(this.forces[index]);
+	//console.log("adding external force");
+	//console.log(this.forces[index]);
 }
 
-Cloth.prototype.updateExternalForce = function(index, position){
+Cloth.prototype.updateExternalForce = function(index, position, magnitude){
 	
 	this.forces[index].previous.copy(this.forces[index].position);
 	this.forces[index].position = position;
 	this.forces[index].diff.subVectors(this.forces[index].position, this.forces[index].previous);
-	console.log("updating external force");
-	console.log(this.forces[index]);
+	this.forces[index].diff.multiplyScalar(magnitude);
+	//console.log("updating external force");
+	//console.log(this.forces[index]);
 }
 
 Cloth.prototype.removeExternalForce = function(index){

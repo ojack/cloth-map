@@ -29,7 +29,7 @@ Particle.prototype.mouseUpdate = function(mousePos, mouseDiff) {
 	if(thisDist < mouse_influence){
 		//console.log("updating ");
 		//var mouseDiff = this.tmp.subVectors(mousePrevious, mousePos)
-		mouseDiff.multiplyScalar(1.0);
+		//mouseDiff.multiplyScalar(1.0);
 		this.previous.subVectors(this.position, mouseDiff);
 	}
 }

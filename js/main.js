@@ -156,7 +156,7 @@ var touches = {};
 
 function onTouchStart( event){
 	event.preventDefault();
-	console.log("touch start!!");
+	//console.log("touch start!!");
 		//console.log(event);
 		for(var i = 0; i < event.changedTouches.length; i++){
 			//console.log(event.changedTouches[i]);
@@ -164,7 +164,7 @@ function onTouchStart( event){
 			//var touchObj = {curr: point, prev: point};
 			cloth.addExternalForce(i, point);
 			//touches[event.changedTouches[i].identifier] = touchObj;
-			addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
+			//addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
 			//console.log(touches);
 		}
 }
@@ -175,15 +175,15 @@ function onTouchMove( event ) {
 			//console.log(event.changedTouches[i]);
 			var point = get3Dpoint(event.changedTouches[i].clientX, event.touches[i].clientY);
 			//var touchObj = {curr: point, prev: point};
-			cloth.updateExternalForce(i, point);
+			cloth.updateExternalForce(i, point, 0.5);
 			//touches[event.changedTouches[i].identifier] = touchObj;
-			addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
+			//addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
 			//console.log(touches);
 		}
 }
 
 function onTouchEnd( event){
-	console.log("touch end!");
+	//console.log("touch end!");
 		//console.log(event);
 		for(var i = 0; i < event.changedTouches.length; i++){
 			//var point = get3Dpoint(event.touches[i].clientX, event.touches[i].clientY);
@@ -214,7 +214,7 @@ function addCube(point){
 function onMouseDown( event ) {
 	event.preventDefault();
 
-	addCube(get3Dpoint(event.clientX, event.clientY));
+	//addCube(get3Dpoint(event.clientX, event.clientY));
 	var point = get3Dpoint(event.clientX, event.clientY);
 			//var touchObj = {curr: point, prev: point};
 	cloth.addExternalForce("mouse", point);
@@ -222,12 +222,12 @@ function onMouseDown( event ) {
 }
 
 function onMouseMove( event ) {
-	console.log('mouse mocv');
+	//console.log('mouse mocv');
 	event.preventDefault();
 	var point = get3Dpoint(event.clientX, event.clientY);
 			//var touchObj = {curr: point, prev: point};
-	cloth.updateExternalForce("mouse", point);
-	addCube(get3Dpoint(event.clientX, event.clientY));
+	cloth.updateExternalForce("mouse", point, 0.7);
+	//addCube(get3Dpoint(event.clientX, event.clientY));
 	//addCube(mouse.x, mouse.y);
 	/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
 	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
