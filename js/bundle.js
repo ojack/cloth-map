@@ -135715,7 +135715,7 @@ function initRenderer(){
 
 	container.appendChild( renderer.domElement );
 	stats = new Stats();
-	container.appendChild( stats.domElement );
+	//container.appendChild( stats.domElement );
 }
 
 //
