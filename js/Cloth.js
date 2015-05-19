@@ -28,7 +28,7 @@ var gravity = new THREE.Vector3( 0, -GRAVITY, 0).multiplyScalar(MASS);
 
 var TIMESTEP = 18 / 1000;
 var TIMESTEP_SQ = TIMESTEP * TIMESTEP;
-          
+var SNAP = 0.004;
 
 var lastTime;
 
@@ -111,12 +111,13 @@ Cloth.prototype.removeExternalForce = function(index){
 
 
 
-Cloth.prototype.simulate = function(time) {
+Cloth.prototype.simulate = function(time, fps) {
 	if (!lastTime) {
 		lastTime = time;
 		return;
 	}
-	
+	SNAP = (100-fps)/10000;
+	console.log(SNAP);
 	var particles = this.particles;
 	var i, il, particles, particle, pt, constrains, constrain;
 	forceDown -= 40; 

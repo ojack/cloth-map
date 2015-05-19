@@ -2,7 +2,8 @@ var json = require('./data/streets.json');
 var Z_DIST = 1900;
 var rotate = !true;
 var forceMove = 0;
-
+var FPS = 0;
+//var SNAP = 0.009;//how much the simulation snaps back to the original positions
 /*init vars */
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -100,9 +101,11 @@ function animate() {
 
 	requestAnimationFrame( animate );
 	var time = Date.now();
-	cloth.simulate(time);
+	cloth.simulate(time, stats.getFPS());
 	render();
 	stats.update();
+	//console.log(stats.getFPS());
+	//console.log(" fps is " + stats.getFps());
 }
 
 /*render scene*/
