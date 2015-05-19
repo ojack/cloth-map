@@ -135802,7 +135802,7 @@ function onTouchMove( event ) {
 			//console.log(event.changedTouches[i]);
 			var point = get3Dpoint(event.changedTouches[i].clientX, event.touches[i].clientY);
 			//var touchObj = {curr: point, prev: point};
-			cloth.updateExternalForce(i, point, 2.0);
+			cloth.updateExternalForce(i, point, 1.0);
 			//touches[event.changedTouches[i].identifier] = touchObj;
 			//addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
 			//console.log(touches);

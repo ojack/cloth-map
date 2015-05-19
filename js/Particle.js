@@ -41,7 +41,7 @@ Particle.prototype.snapBack = function(){
 	diff.subVectors(this.position, this.original);
 
 	//var correction = diff.multiplyScalar(1 - distance / currentDist);
-	var correctionHalf = diff.multiplyScalar(0.009);
+	var correctionHalf = diff.multiplyScalar(0.02);
 	this.position.sub(correctionHalf);
 }
 
