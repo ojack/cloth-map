@@ -57,6 +57,7 @@ function Cloth(w, h) {
 	this.external_force = new THREE.Vector3(0, 0, 0);
 	this.particles = [];
 	this.constrains = [];
+	this.forces = {};
 	this.mouse = {
 		down: false,
         button: 1,
@@ -108,8 +109,26 @@ Cloth.prototype.updateMouseForce = function(mousePos){
 	
 }
 
-Cloth.prototype.addExternalForce = function(posVec){
+Cloth.prototype.addExternalForce = function(index, position){
+	var currPos = position;
+	var prevPos = position;
+	var diff = new THREE.Vector3(0, 0, 0);
+	this.forces[index] = {position: currPos, previous: prevPos, diff: diff};
+	console.log("adding external force");
+	console.log(this.forces[index]);
+}
 
+Cloth.prototype.updateExternalForce = function(index, position){
+	
+	this.forces[index].previous.copy(this.forces[index].position);
+	this.forces[index].position = position;
+	this.forces[index].diff.subVectors(this.forces[index].position, this.forces[index].previous);
+	console.log("updating external force");
+	console.log(this.forces[index]);
+}
+
+Cloth.prototype.removeExternalForce = function(index){
+	delete this.forces[index];
 }
 
 Cloth.prototype.removeMouseForce = function(mousePos){
@@ -143,6 +162,11 @@ Cloth.prototype.simulate = function(time) {
 		// downward force at the beginning
 		if(forceDown > -1000) particle.mouseUpdate(forceLoc, forceDir);
 
+		for (var index in this.forces) {
+  			if (this.forces.hasOwnProperty(index)) {
+    			particle.mouseUpdate(this.forces[index].position, this.forces[index].diff);
+  			}
+		}
 		particle.integrate(TIMESTEP_SQ, this.drag);
 
 

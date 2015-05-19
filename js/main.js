@@ -39,10 +39,10 @@ function init3DScene(){
 	raycaster.linePrecision = 20;
 	animate();
 	window.addEventListener( 'resize', onWindowResize, false );
-	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-	document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-	document.addEventListener( 'toucstart', onDocumentTouchStart, false );
-	//document.addEventListener( 'touchend', onDocumentTouchEnd, false );
+	document.addEventListener( 'mousedown', onMouseDown, false );
+	document.addEventListener( 'touchmove', onTouchMove, false );
+	document.addEventListener( 'touchstart', onTouchStart, false );
+	document.addEventListener( 'touchend', onTouchEnd, false );
 	document.addEventListener( 'mouseup', onMouseUp, false );
 	document.onkeydown = checkKey;
 
@@ -155,47 +155,43 @@ function onWindowResize() {
 var touches = {};
 
 function onTouchStart( event){
-		for(var i = 0; i < event.touches.length; i++){
-				//event.clientX = event.touches[0].clientX;
-			//	event.clientY = event.touches[0].clientY;
-			//	var x = (event.touches[i].clientX/ renderer.domElement.width ) * 2 - 1;
-			//	var y = (event.touches[i].clientY / renderer.domElement.height ) * 2 + 1;
-			var point = get3Dpoint(event.touches[i].clientX, event.touches[i].clientY);
-			var touchObj = {curr: point, prev: point};
-
-			touches[event.touched[i].identity] = touchObj;
-			addCube(get3Dpoint(event.touches[i].clientX, event.touches[i].clientY));
-			console.log(touches);
-			/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-			mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
-			raycaster.setFromCamera( mouse, camera );
-			var intersects = raycaster.intersectObjects( objects, true );	
-			if ( intersects.length > 0 ) {
-				cloth.updateMouseForce(intersects[0].point);
-			}*/
+	event.preventDefault();
+	console.log("touch start!!");
+		//console.log(event);
+		for(var i = 0; i < event.changedTouches.length; i++){
+			//console.log(event.changedTouches[i]);
+			var point = get3Dpoint(event.changedTouches[i].clientX, event.touches[i].clientY);
+			//var touchObj = {curr: point, prev: point};
+			cloth.addExternalForce(i, point);
+			//touches[event.changedTouches[i].identifier] = touchObj;
+			addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
+			//console.log(touches);
 		}
 }
-function onDocumentTouchMove( event ) {		
+function onTouchMove( event ) {		
 				event.preventDefault();
+//console.log(event);
+			for(var i = 0; i < event.changedTouches.length; i++){
+			//console.log(event.changedTouches[i]);
+			var point = get3Dpoint(event.changedTouches[i].clientX, event.touches[i].clientY);
+			//var touchObj = {curr: point, prev: point};
+			cloth.updateExternalForce(i, point);
+			//touches[event.changedTouches[i].identifier] = touchObj;
+			addCube(get3Dpoint(event.changedTouches[i].clientX, event.changedTouches[i].clientY));
+			//console.log(touches);
+		}
+}
 
-			for(var i = 0; i < event.touches.length; i++){
-				//event.clientX = event.touches[0].clientX;
-			//	event.clientY = event.touches[0].clientY;
-			//	var x = (event.touches[i].clientX/ renderer.domElement.width ) * 2 - 1;
-			//	var y = (event.touches[i].clientY / renderer.domElement.height ) * 2 + 1;
-			var point = get3Dpoint(event.touches[i].clientX, event.touches[i].clientY);
-			var touchObj = {curr: point, prev: point};
-
-			touches[event.touched[i].identity] = touchObj;
-			addCube(get3Dpoint(event.touches[i].clientX, event.touches[i].clientY));
-			console.log(event.touches[i]);
-			/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-			mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
-			raycaster.setFromCamera( mouse, camera );
-			var intersects = raycaster.intersectObjects( objects, true );	
-			if ( intersects.length > 0 ) {
-				cloth.updateMouseForce(intersects[0].point);
-			}*/
+function onTouchEnd( event){
+	console.log("touch end!");
+		//console.log(event);
+		for(var i = 0; i < event.changedTouches.length; i++){
+			//var point = get3Dpoint(event.touches[i].clientX, event.touches[i].clientY);
+			//var touchObj = {curr: point, prev: point};
+			cloth.removeExternalForce(i);
+			//delete touches[event.changedTouches[i].identifier];
+			//addCube(get3Dpoint(event.touches[i].clientX, event.touches[i].clientY));
+			//console.log(touches);
 		}
 }
 
@@ -213,39 +209,24 @@ function addCube(point){
    
 }
 
-function onDocumentTouchEnd(  ) {
-			document.removeEventListener( 'touchmove', onDocumentTouchMove, false );
-	cloth.removeMouseForce();
-}
 
-function onDocumentTouchStart( event ) {
-			//	console.log("touch down");
-			//	event.preventDefault();
-				
-			/*	event.clientX = event.touches[0].clientX;
-				event.clientY = event.touches[0].clientY;
-				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
-	raycaster.setFromCamera( mouse, camera );
-	var intersects = raycaster.intersectObjects( objects, true );
-	//console.log(" mousedown " + mouse.x + " intersected "+ intersects.length);
-	if ( intersects.length > 0 ) {
-		cloth.addMouseForce(intersects[0].point);
-	}
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );*/
 
-}
-
-function onDocumentMouseDown( event ) {
+function onMouseDown( event ) {
 	event.preventDefault();
 
 	addCube(get3Dpoint(event.clientX, event.clientY));
-	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+	var point = get3Dpoint(event.clientX, event.clientY);
+			//var touchObj = {curr: point, prev: point};
+	cloth.addExternalForce("mouse", point);
+	document.addEventListener( 'mousemove', onMouseMove, false );
 }
 
-function onDocumentMouseMove( event ) {
+function onMouseMove( event ) {
 	console.log('mouse mocv');
 	event.preventDefault();
+	var point = get3Dpoint(event.clientX, event.clientY);
+			//var touchObj = {curr: point, prev: point};
+	cloth.updateExternalForce("mouse", point);
 	addCube(get3Dpoint(event.clientX, event.clientY));
 	//addCube(mouse.x, mouse.y);
 	/*mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
@@ -256,6 +237,11 @@ function onDocumentMouseMove( event ) {
 	//	addCube(intersects[0].point);
 		cloth.updateMouseForce(intersects[0].point);
 	}*/
+}
+
+function onMouseUp(){
+	document.removeEventListener( 'mousemove', onMouseMove, false );
+	cloth.removeExternalForce("mouse");
 }
 
 function get3Dpoint(x, y){
@@ -276,7 +262,3 @@ return camera.position.clone().add( dir.multiplyScalar( distance ) );
 	
 }
 
-function onMouseUp(){
-	document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-	cloth.removeMouseForce();
-}

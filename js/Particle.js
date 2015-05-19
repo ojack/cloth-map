@@ -22,6 +22,7 @@ Particle.prototype.addForce = function(force) {
 	);
 };
 
+//add forces to particles near the mouse or touch point
 Particle.prototype.mouseUpdate = function(mousePos, mouseDiff) {
 
 	var thisDist = this.position.distanceTo(mousePos);
