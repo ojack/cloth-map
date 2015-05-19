@@ -23,7 +23,7 @@ Particle.prototype.addForce = function(force) {
 };
 
 //add forces to particles near the mouse or touch point
-Particle.prototype.mouseUpdate = function(mousePos, mouseDiff) {
+Particle.prototype.externalForceUpdate = function(mousePos, mouseDiff) {
 
 	var thisDist = this.position.distanceTo(mousePos);
 	if(thisDist < mouse_influence){
@@ -41,7 +41,7 @@ Particle.prototype.snapBack = function(){
 	diff.subVectors(this.position, this.original);
 
 	//var correction = diff.multiplyScalar(1 - distance / currentDist);
-	var correctionHalf = diff.multiplyScalar(0.002);
+	var correctionHalf = diff.multiplyScalar(0.009);
 	this.position.sub(correctionHalf);
 }
 
