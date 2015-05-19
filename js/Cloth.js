@@ -117,7 +117,7 @@ Cloth.prototype.simulate = function(time, fps) {
 		return;
 	}
 	SNAP = (100-fps)/10000;
-	console.log(SNAP);
+	//console.log(SNAP);
 	var particles = this.particles;
 	var i, il, particles, particle, pt, constrains, constrain;
 	forceDown -= 40; 
