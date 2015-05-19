@@ -120,10 +120,10 @@ Cloth.prototype.simulate = function(time, fps) {
 	//console.log(SNAP);
 	var particles = this.particles;
 	var i, il, particles, particle, pt, constrains, constrain;
-	forceDown -= 40; 
+	forceDown -= 20; 
 	var forceLoc = new THREE.Vector3(200, forceDown, 0);
 	//var forceDir = new THREE.Vector3(100-forceDown, 100-forceDown, 5);
-	var forceDir = new THREE.Vector3(4, 4, 0);
+	var forceDir = new THREE.Vector3(10, 4, 0);
 	//add gravity
 	for (particles = this.particles, i = 0, il = particles.length
 			; i < il; i ++) {
